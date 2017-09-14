@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>b047a5b7-44ba-4bfe-a974-3701c5e4c3df</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>driver.py</StartupFile>
+    <StartupFile>model2.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -25,14 +25,14 @@
     <Compile Include="driver.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="fgsm.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="model1.py" />
     <Compile Include="mnist_deep.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="model2.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="model3.py">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
