@@ -1,10 +1,48 @@
 import h5py
+import numpy as np
+import data_loader
+import os
 
 class DigitStruct:
     def __init__(self, file):
         self.file = h5py.File(file, 'r')
         self.digit_struct_name = self.file['digitStruct']['name']
         self.digit_struct_bbox = self.file['digitStruct']['bbox']
+
+    def load_labels_or_extract(self, file_path):
+
+        result = data_loader.openPickle(file_path)
+        if result != None:
+            return result
+
+        print("We need to extract the labels from the structure file. This will take a few minutes...")
+        num_labels = 11
+        max_digits = 5
+        all_structs = self.get_all_imgs_and_digit_structure()
+
+        labels = []
+        for i in range(0, len(all_structs)):
+            struct = all_structs[i]
+            label_numbers = struct["label"]
+            if(len(label_numbers) > max_digits):
+                print("THIS ONE HAS MORE THAN FIVE DIGITS:", i)
+                print(struct)
+                #Skip it
+                continue
+            new_labels = []
+            for j in range(0, len(label_numbers)):
+                label = int(label_numbers[j])
+                newLabel = (np.arange(num_labels) == label).astype(np.float32)
+                new_labels.append(newLabel)
+            for j in range(len(label_numbers), max_digits):
+                newLabel = (np.zeros(num_labels))
+                newLabel[-1] = 1.0
+                new_labels.append(newLabel)
+
+            labels.append(new_labels)
+
+        data_loader.savePickle(labels, file_path)
+        return labels
 
     def get_img_name(self, n):
         '''
