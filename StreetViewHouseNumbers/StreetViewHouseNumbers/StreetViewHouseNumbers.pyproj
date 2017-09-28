@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>a002fb22-15e6-4604-8c5f-10f3ac7849a7</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>drivers.py</StartupFile>
+    <StartupFile>model1.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -22,7 +22,13 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="digit_struct.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="drivers.py" />
+    <Compile Include="image_helpers.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="model1.py">
       <SubType>Code</SubType>
     </Compile>
