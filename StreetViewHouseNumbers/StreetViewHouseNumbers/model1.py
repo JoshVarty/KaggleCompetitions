@@ -6,6 +6,7 @@ import os
 from digit_struct import DigitStruct
 from image_helpers import prep_data
 from sklearn.model_selection import train_test_split
+import tensorflow as tf
 
 if sys.platform == 'win32':
     os.chdir("C:\\git\\KaggleCompetitions\\StreetViewHouseNumbers\\StreetViewHouseNumbers")
@@ -37,6 +38,29 @@ train_dataset_rand, train_labels_rand = randomize(train_normalized, labels)
 train_images, valid_images, train_labels, valid_labels = train_test_split(train_dataset_rand, train_labels_rand, train_size=0.8, random_state=0)
 
 
+
+def TrainConvNet(model_save_path):
+
+    pass
+
+def weight_layer(name, shape):
+    return tf.get_variable(name, shape, initializer=tf.contrib.layers.xavier_initializer())
+
+def bias_variable(name, shape):
+      return tf.get_variable(name, shape, initializer=tf.contrib.layers.xavier_initializer())
+
+def conv2d(input, weights):
+    return tf.nn.conv2d(input, weights, [1,1,1,1], padding="SAME")
+
+def max_pool_2x2(input):    
+    return tf.nn.max_pool(x, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
+
+
+
+
+
+
+    
 
 
 
