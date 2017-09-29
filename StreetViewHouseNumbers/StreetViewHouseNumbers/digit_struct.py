@@ -21,9 +21,11 @@ class DigitStruct:
         all_structs = self.get_all_imgs_and_digit_structure()
 
         labels = []
+        paths = []
         for i in range(0, len(all_structs)):
             struct = all_structs[i]
             label_numbers = struct["label"]
+
             if(len(label_numbers) > max_digits):
                 print("THIS ONE HAS MORE THAN FIVE DIGITS:", i)
                 print(struct)
@@ -40,9 +42,10 @@ class DigitStruct:
                 new_labels.append(newLabel)
 
             labels.append(new_labels)
+            paths.append(struct["name"])
 
-        data_loader.savePickle(labels, file_path)
-        return labels
+        data_loader.savePickle((labels,paths), file_path)
+        return (labels, paths)
 
     def get_img_name(self, n):
         '''

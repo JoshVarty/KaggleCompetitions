@@ -18,24 +18,21 @@ depth = 32
 
 TRAIN_DIR = "../input/train/"
 digit_struct = DigitStruct(TRAIN_DIR + "/digitStruct.mat")
-labels = digit_struct.load_labels_or_extract("../input/train/labels.pickle")
+labels, paths = digit_struct.load_labels_or_extract("../input/train/labels_and_paths.pickle")
 
-print("Labels:", len(labels))
+image_paths = [TRAIN_DIR + s for s in paths]
 
-
-train_images = [TRAIN_DIR+i for i in os.listdir(TRAIN_DIR)] 
-#Remove the last three entries
-train_images = train_images[:-3]
-
-length = len(train_images)
-
-
-train_normalized = prep_data(train_images, image_size, num_channels, pixel_depth)
+train_normalized = prep_data(image_paths, image_size, num_channels, pixel_depth)
 print("Train shape: {}".format(train_normalized.shape))
 
+#x = labels[2]
+#plt.imshow(train_normalized[2])
+#plt.show()
 
-plt.imshow(train_normalized[1])
-plt.show()
+
+#x = labels[4]
+#plt.imshow(train_normalized[4])
+#plt.show()
 
 #np.random.seed(42)
 #def randomize(dataset, labels):
