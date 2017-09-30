@@ -42,6 +42,7 @@ train_images, valid_images, train_labels, valid_labels = train_test_split(train_
 def TrainConvNet(model_save_path, keep_prob):
     
     input = tf.placeholder(tf.float32, shape=(None, image_size, image_size, num_channels))
+    labels = tf.placeholder(tf.float32, shape=(None, 55))
     keep_prob = tf.placeholder(tf.float32)
 
     #Conv->Relu->Conv->Relu->Pool
@@ -81,12 +82,46 @@ def TrainConvNet(model_save_path, keep_prob):
     fc = 234
     w_fc_1 = weight_layer("w_fc_1", [fc, 4096])
     b_fc_1 = bias_variable("b_fc_1", [4096])
-    hidden_1 = tf.matmul(reshape, w_fc_1) + b_fc_1
+    h_fc_1 = tf.matmul(reshape, w_fc_1) + b_fc_1
 
-    drop_2 = tf.nn.dropout(hidden_1, keep_prob)
+    drop_2 = tf.nn.dropout(h_fc_1, keep_prob)
     w_fc_2 = weight_layer("w_fc_2", [4096, num_labels])
     b_fc_2 = bias_variable("b_fc_2", [num_labels])
-    logits = tf.matmul(drop_2, w_fc_2) + b_fc_2
+    h_fc_2 = tf.matmul(drop_2, w_fc_2) + b_fc_2
+
+
+    #Slice it out
+    #x = tf.slice(h_fc_2, [0,0,0], [-1, -1, - 1])
+
+    with tf.Session(graph=graph) as session:
+        num_steps = 10000
+        batch_size = 32
+        tf.global_variables_initializer().run()
+        print("Initialized")
+
+        for step in range(num_steps):
+            offset = (step * batch_size) % (train_labels.shape[0] - batch_size)
+            batch_data = train_images[offset:(offset + batch_size), :, :, :]
+            batch_labels = train_labels[offset:(offset + batch_size), :]
+
+            feed_dict = {input : batch_data, labels : batch_labels}
+
+            if step % 500 == 0:
+                _, l, predictions, m = session.run([optimizer, loss, train_prediction, merged], feed_dict=feed_dict)
+                print('Minibatch loss at step %d: %f' % (step, l))
+                print('Minibatch accuracy: %.1f%%' % accuracy(predictions, batch_labels))
+                #Validation
+                feed_dict = {input : valid_images, labels : valid_labels}
+                _, l, predictions, m = session.run([optimizer, loss, train_prediction, merged], feed_dict=feed_dict)
+                print('Valid accuracy: %.1f%%' % accuracy(predictions, valid_labels))
+            else:
+                _, l, predictions, m = session.run([optimizer, loss, train_prediction, merged], feed_dict=feed_dict)
+
+
+
+           
+
+
 
     tf_train_dataset = tf.placeholder(tf.float32, shape=(batch_size, image_size, image_size, num_channels))
     tf_train_labels = tf.placeholder(tf.float32, shape=(batch_size, num_labels))
