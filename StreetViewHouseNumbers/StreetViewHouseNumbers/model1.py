@@ -14,13 +14,18 @@ if sys.platform == 'win32':
 image_size = 96
 num_channels = 3
 pixel_depth = 255.0  # Number of levels per pixel.
-num_labels = 2
+num_labels = 5
 patch_size_3 = 3
 depth = 32
 
 TRAIN_DIR = "../input/train/"
 digit_struct = DigitStruct(TRAIN_DIR + "/digitStruct.mat")
 labels, paths = digit_struct.load_labels_or_extract("../input/train/labels_and_paths.pickle")
+
+
+labels = labels[:1000]
+labels = np.array(labels)
+paths = paths[:1000]
 
 image_paths = [TRAIN_DIR + s for s in paths]
 
@@ -39,10 +44,10 @@ train_images, valid_images, train_labels, valid_labels = train_test_split(train_
 
 
 
-def TrainConvNet(model_save_path, keep_prob):
+def TrainConvNet(model_save_path):
     
     input = tf.placeholder(tf.float32, shape=(None, image_size, image_size, num_channels))
-    labels = tf.placeholder(tf.float32, shape=(None, 55))
+    labels = tf.placeholder(tf.float32, shape=(None, 5, 11))
     keep_prob = tf.placeholder(tf.float32)
 
     #Conv->Relu->Conv->Relu->Pool
@@ -66,7 +71,7 @@ def TrainConvNet(model_save_path, keep_prob):
     #Conv->Relu->Conv->Relu->Conv->Relu->Pool
     w_conv5 = weight_layer("w_conv5", [patch_size_3, patch_size_3, depth * 4, depth * 4])
     b_conv5 = bias_variable("b_conv5", [depth * 4])
-    h_conv5 = conv2d_relu(h_pool4, w_conv4, b_conv4)
+    h_conv5 = conv2d_relu(h_pool4, w_conv5, b_conv5)
     w_conv6 = weight_layer("w_conv6", [patch_size_3, patch_size_3, depth * 4, depth * 4])
     b_conv6 = bias_variable("b_conv6", [depth * 4])
     h_conv6 = conv2d_relu(h_conv5, w_conv6, b_conv6)
@@ -77,18 +82,40 @@ def TrainConvNet(model_save_path, keep_prob):
     #Dropout -> Fully Connected -> Dropout -> Fully Connected
     drop_1 = tf.nn.dropout(h_pool7, keep_prob)
     shape = drop_1.get_shape().as_list()
-    reshape = tf.reshape(drop_1, [shape[0], shape[1] * shape[2] * shape[3]])
+    reshape = tf.reshape(drop_1, [-1, shape[1] * shape[2] * shape[3]])
 
-    fc = 234
+    fc = 18432
     w_fc_1 = weight_layer("w_fc_1", [fc, 4096])
     b_fc_1 = bias_variable("b_fc_1", [4096])
     h_fc_1 = tf.matmul(reshape, w_fc_1) + b_fc_1
 
     drop_2 = tf.nn.dropout(h_fc_1, keep_prob)
-    w_fc_2 = weight_layer("w_fc_2", [4096, num_labels])
-    b_fc_2 = bias_variable("b_fc_2", [num_labels])
+    w_fc_2 = weight_layer("w_fc_2", [4096, 11 * num_labels])
+    b_fc_2 = bias_variable("b_fc_2", [11 * num_labels])
     h_fc_2 = tf.matmul(drop_2, w_fc_2) + b_fc_2
 
+
+    labels1 = tf.squeeze(tf.slice(labels, [-1, 0, 0], [-1, 1, 11]), axis=1)
+    labels2 = tf.squeeze(tf.slice(labels, [-1, 1, 0], [-1, 1, 11]), axis=1)
+    labels3 = tf.squeeze(tf.slice(labels, [-1, 2, 0], [-1, 1, 11]), axis=1)
+    labels4 = tf.squeeze(tf.slice(labels, [-1, 3, 0], [-1, 1, 11]), axis=1)
+    labels5 = tf.squeeze(tf.slice(labels, [-1, 4, 0], [-1, 1, 11]), axis=1)
+
+    logits1 = tf.slice(h_fc_2, [-1, 0], [-1, 11])
+    logits2 = tf.slice(h_fc_2, [-1, 11], [-1, 11])
+    logits3 = tf.slice(h_fc_2, [-1, 22], [-1, 11])
+    logits4 = tf.slice(h_fc_2, [-1, 33], [-1, 11])
+    logits5 = tf.slice(h_fc_2, [-1, 44], [-1, 11])
+
+    cost1 = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=labels1, logits=logits1))
+    cost2 = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=labels2, logits=logits2))
+    cost3 = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=labels3, logits=logits3))
+    cost4 = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=labels4, logits=logits4))
+    cost5 = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=labels5, logits=logits5))
+
+    total_cost = cost1 + cost2 + cost3 + cost4 + cost5
+
+    optimizer = tf.train.AdamOptimizer(0.00001).minimize(total_cost)
 
     #Slice it out
     #x = tf.slice(h_fc_2, [0,0,0], [-1, -1, - 1])
@@ -117,16 +144,6 @@ def TrainConvNet(model_save_path, keep_prob):
             else:
                 _, l, predictions, m = session.run([optimizer, loss, train_prediction, merged], feed_dict=feed_dict)
 
-
-
-           
-
-
-
-    tf_train_dataset = tf.placeholder(tf.float32, shape=(batch_size, image_size, image_size, num_channels))
-    tf_train_labels = tf.placeholder(tf.float32, shape=(batch_size, num_labels))
-    tf_valid_dataset = tf.constant(valid_dataset, dtype=tf.float32)
-
 def weight_layer(name, shape):
     return tf.get_variable(name, shape, initializer=tf.contrib.layers.xavier_initializer())
 
@@ -140,6 +157,7 @@ def max_pool_2x2(input):
     return tf.nn.max_pool(input, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
 
 
+TrainConvNet("")
 
 
 
