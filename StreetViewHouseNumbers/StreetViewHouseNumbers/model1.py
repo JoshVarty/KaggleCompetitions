@@ -167,9 +167,20 @@ def TrainConvNet(model_save_path):
                     print('Minibatch loss at step %d: %f' % (step, l))
                     print('Minibatch accuracy: %.1f%%' % accuracy(predictions, batch_labels))
                     #Validation
-                    feed_dict = {input : valid_images, labels : valid_labels}
-                    _, l, predictions = session.run([optimizer, total_cost, train_prediction], feed_dict=feed_dict)
-                    print('Valid accuracy: %.1f%%' % accuracy(predictions, valid_labels))
+
+                    v_steps = 5
+                    v_batch_size = int(valid_images.shape[0] / v_steps)
+                    v_preds = np.zeros_like(valid_labels)
+                    for v_step in range(v_steps):
+                        v_offset = (v_step * v_batch_size) 
+                        v_batch_data = valid_images[v_offset:(v_offset + v_batch_size), :, :, :]
+                        v_batch_labels = valid_labels[v_offset:(v_offset + v_batch_size),:]
+
+                        feed_dict = {input : v_batch_data, labels : v_batch_labels}
+                        _, l, predictions = session.run([optimizer, total_cost, train_prediction], feed_dict=feed_dict)
+                        v_preds[v_offset: v_offset + predictions.shape[0],:,:] = predictions
+
+                    print('Valid accuracy: %.1f%%' % accuracy(v_preds, valid_labels))
                 else:
                     _, l, predictions = session.run([optimizer, total_cost, train_prediction], feed_dict=feed_dict)
 
