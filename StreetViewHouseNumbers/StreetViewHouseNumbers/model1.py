@@ -1,6 +1,6 @@
 import numpy as np
 import scipy.io as sio
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import sys
 import os
 from digit_struct import DigitStruct
@@ -23,9 +23,7 @@ digit_struct = DigitStruct(TRAIN_DIR + "/digitStruct.mat")
 labels, paths = digit_struct.load_labels_or_extract("../input/train/labels_and_paths.pickle")
 
 
-labels = labels[:1000]
 labels = np.array(labels)
-paths = paths[:1000]
 
 image_paths = [TRAIN_DIR + s for s in paths]
 
@@ -61,7 +59,7 @@ def accuracy(predictions, labels):
     return 100 * (num1 + num2 + num3 + num4 + num5) / (predictions.shape[0] * predictions.shape[1])
 
 train_dataset_rand, train_labels_rand = randomize(train_normalized, labels)
-train_images, valid_images, train_labels, valid_labels = train_test_split(train_dataset_rand, train_labels_rand, train_size=0.8, random_state=0)
+train_images, valid_images, train_labels, valid_labels = train_test_split(train_dataset_rand, train_labels_rand, train_size=0.9, random_state=0)
 
 
 
