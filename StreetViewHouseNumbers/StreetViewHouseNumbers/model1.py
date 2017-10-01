@@ -180,6 +180,16 @@ def TrainConvNet(model_save_path):
                         _, l, predictions = session.run([optimizer, total_cost, train_prediction], feed_dict=feed_dict)
                         v_preds[v_offset: v_offset + predictions.shape[0],:,:] = predictions
 
+                    #If we missed any validation images at the end, process them now
+                    if v_steps * v_batch_size < valid_images.shape[0]:
+                        v_offset = (v_steps * v_batch_size) 
+                        v_batch_data = valid_images[v_offset:valid_images.shape[0] , :, :, :]
+                        v_batch_labels = valid_labels[v_offset:valid_images.shape[0],:]
+
+                        feed_dict = {input : v_batch_data, labels : v_batch_labels}
+                        _, l, predictions = session.run([optimizer, total_cost, train_prediction], feed_dict=feed_dict)
+                        v_preds[v_offset: v_offset + predictions.shape[0],:,:] = predictions
+
                     print('Valid accuracy: %.1f%%' % accuracy(v_preds, valid_labels))
                 else:
                     _, l, predictions = session.run([optimizer, total_cost, train_prediction], feed_dict=feed_dict)
