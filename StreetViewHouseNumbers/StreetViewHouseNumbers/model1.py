@@ -107,11 +107,11 @@ def TrainConvNet(model_save_path):
     logits4 = tf.slice(h_fc_2, [-1, 33], [-1, 11])
     logits5 = tf.slice(h_fc_2, [-1, 44], [-1, 11])
 
-    cost1 = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=labels1, logits=logits1))
-    cost2 = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=labels2, logits=logits2))
-    cost3 = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=labels3, logits=logits3))
-    cost4 = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=labels4, logits=logits4))
-    cost5 = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=labels5, logits=logits5))
+    cost1 = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=labels1, logits=logits1))
+    cost2 = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=labels2, logits=logits2))
+    cost3 = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=labels3, logits=logits3))
+    cost4 = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=labels4, logits=logits4))
+    cost5 = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=labels5, logits=logits5))
 
     total_cost = cost1 + cost2 + cost3 + cost4 + cost5
 
