@@ -50,7 +50,7 @@ def TrainConvNet(model_save_path):
     with graph.as_default():
         input = tf.placeholder(tf.float32, shape=(None, image_size, image_size, num_channels))
         labels = tf.placeholder(tf.float32, shape=(None, 5, 11))
-        keep_prob = tf.placeholder(tf.float32)
+        #keep_prob = tf.placeholder(tf.float32)
 
         #Conv->Relu->Conv->Relu->Pool
         w_conv1 = weight_layer("w_conv1", [patch_size_3, patch_size_3, num_channels, depth])
@@ -82,7 +82,7 @@ def TrainConvNet(model_save_path):
         h_pool7 = max_pool_2x2(h_conv6)
 
         #Dropout -> Fully Connected -> Dropout -> Fully Connected
-        drop_1 = tf.nn.dropout(h_pool7, keep_prob)
+        drop_1 = tf.nn.dropout(h_pool7, 1.0)
         shape = drop_1.get_shape().as_list()
         reshape = tf.reshape(drop_1, [-1, shape[1] * shape[2] * shape[3]])
 
@@ -91,7 +91,7 @@ def TrainConvNet(model_save_path):
         b_fc_1 = bias_variable("b_fc_1", [4096])
         h_fc_1 = tf.matmul(reshape, w_fc_1) + b_fc_1
 
-        drop_2 = tf.nn.dropout(h_fc_1, keep_prob)
+        drop_2 = tf.nn.dropout(h_fc_1, 1.0)
         w_fc_2 = weight_layer("w_fc_2", [4096, 11 * num_labels])
         b_fc_2 = bias_variable("b_fc_2", [11 * num_labels])
         h_fc_2 = tf.matmul(drop_2, w_fc_2) + b_fc_2
@@ -116,6 +116,14 @@ def TrainConvNet(model_save_path):
         cost5 = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=labels5, logits=logits5))
 
         total_cost = cost1 + cost2 + cost3 + cost4 + cost5
+
+        train_prediction = tf.stack([
+            tf.nn.softmax(logits1),
+            tf.nn.softmax(logits2),
+            tf.nn.softmax(logits3),
+            tf.nn.softmax(logits4),
+            tf.nn.softmax(logits5),
+            ], axis=1)
 
         optimizer = tf.train.AdamOptimizer(0.00001).minimize(total_cost)
 
