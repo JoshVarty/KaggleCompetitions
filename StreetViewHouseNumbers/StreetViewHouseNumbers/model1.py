@@ -39,6 +39,27 @@ def randomize(dataset, labels):
   shuffled_labels = labels[permutation]
   return shuffled_dataset, shuffled_labels
 
+def accuracy(predictions, labels):
+    labels1 = labels[:,0,:]
+    labels2 = labels[:,1,:]
+    labels3 = labels[:,2,:]
+    labels4 = labels[:,3,:]
+    labels5 = labels[:,4,:]
+
+    pred1 = predictions[:,0,:]
+    pred2 = predictions[:,1,:]
+    pred3 = predictions[:,2,:]
+    pred4 = predictions[:,3,:]
+    pred5 = predictions[:,4,:]
+
+    num1 = np.sum(np.argmax(pred1, 1) == np.argmax(labels1,1))
+    num2 = np.sum(np.argmax(pred2, 1) == np.argmax(labels2,1))
+    num3 = np.sum(np.argmax(pred3, 1) == np.argmax(labels3,1))
+    num4 = np.sum(np.argmax(pred4, 1) == np.argmax(labels4,1))
+    num5 = np.sum(np.argmax(pred5, 1) == np.argmax(labels5,1))
+
+    return 100 * (num1 + num2 + num3 + num4 + num5) / (predictions.shape[0] * predictions.shape[1])
+
 train_dataset_rand, train_labels_rand = randomize(train_normalized, labels)
 train_images, valid_images, train_labels, valid_labels = train_test_split(train_dataset_rand, train_labels_rand, train_size=0.8, random_state=0)
 
@@ -97,17 +118,17 @@ def TrainConvNet(model_save_path):
         h_fc_2 = tf.matmul(drop_2, w_fc_2) + b_fc_2
 
 
-        labels1 = tf.squeeze(tf.slice(labels, [-1, 0, 0], [-1, 1, 11]), axis=1)
-        labels2 = tf.squeeze(tf.slice(labels, [-1, 1, 0], [-1, 1, 11]), axis=1)
-        labels3 = tf.squeeze(tf.slice(labels, [-1, 2, 0], [-1, 1, 11]), axis=1)
-        labels4 = tf.squeeze(tf.slice(labels, [-1, 3, 0], [-1, 1, 11]), axis=1)
-        labels5 = tf.squeeze(tf.slice(labels, [-1, 4, 0], [-1, 1, 11]), axis=1)
+        labels1 = tf.squeeze(tf.slice(labels, [0, 0, 0], [-1, 1, 11]), axis=1)
+        labels2 = tf.squeeze(tf.slice(labels, [0, 1, 0], [-1, 1, 11]), axis=1)
+        labels3 = tf.squeeze(tf.slice(labels, [0, 2, 0], [-1, 1, 11]), axis=1)
+        labels4 = tf.squeeze(tf.slice(labels, [0, 3, 0], [-1, 1, 11]), axis=1)
+        labels5 = tf.squeeze(tf.slice(labels, [0, 4, 0], [-1, 1, 11]), axis=1)
 
-        logits1 = tf.slice(h_fc_2, [-1, 0], [-1, 11])
-        logits2 = tf.slice(h_fc_2, [-1, 11], [-1, 11])
-        logits3 = tf.slice(h_fc_2, [-1, 22], [-1, 11])
-        logits4 = tf.slice(h_fc_2, [-1, 33], [-1, 11])
-        logits5 = tf.slice(h_fc_2, [-1, 44], [-1, 11])
+        logits1 = tf.slice(h_fc_2, [0, 0], [-1, 11])
+        logits2 = tf.slice(h_fc_2, [0, 11], [-1, 11])
+        logits3 = tf.slice(h_fc_2, [0, 22], [-1, 11])
+        logits4 = tf.slice(h_fc_2, [0, 33], [-1, 11])
+        logits5 = tf.slice(h_fc_2, [0, 44], [-1, 11])
 
         cost1 = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=labels1, logits=logits1))
         cost2 = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=labels2, logits=logits2))
@@ -149,10 +170,10 @@ def TrainConvNet(model_save_path):
                     print('Minibatch accuracy: %.1f%%' % accuracy(predictions, batch_labels))
                     #Validation
                     feed_dict = {input : valid_images, labels : valid_labels}
-                    _, l, predictions,= session.run([optimizer, total_cost, train_prediction], feed_dict=feed_dict)
+                    _, l, predictions = session.run([optimizer, total_cost, train_prediction], feed_dict=feed_dict)
                     print('Valid accuracy: %.1f%%' % accuracy(predictions, valid_labels))
                 else:
-                    _, l, predictions, m = session.run([optimizer, loss, train_prediction, merged], feed_dict=feed_dict)
+                    _, l, predictions = session.run([optimizer, total_cost, train_prediction], feed_dict=feed_dict)
 
 def weight_layer(name, shape):
     return tf.get_variable(name, shape, initializer=tf.contrib.layers.xavier_initializer())
