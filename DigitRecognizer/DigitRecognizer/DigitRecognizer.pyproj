@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>b047a5b7-44ba-4bfe-a974-3701c5e4c3df</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>blur_image.py</StartupFile>
+    <StartupFile>resnet_model.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -36,6 +36,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="model2.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="resnet_model.py">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
