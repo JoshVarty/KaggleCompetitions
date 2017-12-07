@@ -32,10 +32,10 @@ train_data, valid_data, train_labels, valid_labels = train_test_split(train_data
 #Convert to numpy arrays for tensorflow
 train_data, train_labels = reformat(train_data.as_matrix(), train_labels.as_matrix())
 
-print("Train data", train_data.shape, flush=True)
-print("Train labels", train_labels.shape, flush=True)
-print("Test data", valid_data.shape, flush=True)
-print("Test labels", valid_labels.shape, flush=True)
+print("Train data", train_data.shape)
+print("Train labels", train_labels.shape)
+print("Test data", valid_data.shape)
+print("Test labels", valid_labels.shape)
 
 def TrainModel(min_lr, max_lr, stepsize, max_iter, name):
 
@@ -249,8 +249,8 @@ def TrainModel(min_lr, max_lr, stepsize, max_iter, name):
                     writer.add_summary(m, step)
 
                     if step % 500 == 0:
-                        print('Minibatch loss at step %d: %f' % (step, l), flush=True)
-                        print('Minibatch accuracy: %.1f%%' % (acc * 100), flush=True) 
+                        print('Minibatch loss at step %d: %f' % (step, l))
+                        print('Minibatch accuracy: %.1f%%' % (acc * 100))
                 else:
                     _, l, predictions, = session.run([optimizer, cost, train_prediction], feed_dict=feed_dict)
                     
@@ -270,7 +270,7 @@ def TrainModel(min_lr, max_lr, stepsize, max_iter, name):
                         l, predictions, acc = session.run([cost, train_prediction, tf_accuracy], feed_dict=feed_dict)
                         accuracySum = accuracySum + acc
 
-                    print('Test accuracy: %.1f%%' % ((accuracySum / 100) * 100), flush=True)
+                    print('Test accuracy: %.1f%%' % ((accuracySum / 100) * 100))
         
 
 if __name__ == '__main__':
@@ -284,4 +284,4 @@ if __name__ == '__main__':
     stepsize = 5000
     max_iter = 10000
 
-    TrainModel(min_lr=0.1, max_lr=3.0, stepsize=5000, max_iter=10000, name="Fig1b")
+    TrainModel(0.1, 3.0, 5000, 10000, "Fig1b")
