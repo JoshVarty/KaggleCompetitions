@@ -23,8 +23,6 @@ train_labels = train_data.iloc[:,:1]
 
 def reformat(dataset, labels):
   dataset = dataset.reshape((-1, image_size, image_size, num_channels)).astype(np.float32)
-  labels = (np.arange(num_labels) == labels[:,None]).astype(np.float32)
-  labels = np.reshape(labels, (len(labels), num_labels))
   return dataset, labels
 
 train_data, valid_data, train_labels, valid_labels = train_test_split(train_data, train_labels, train_size=0.90, random_state=0)
