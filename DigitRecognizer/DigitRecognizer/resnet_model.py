@@ -259,7 +259,7 @@ def TrainModel(min_lr, max_lr, stepsize, max_iter, name):
                         break
 
                 num_batches = 42
-                if step % 100 == 0:
+                if step % 500 == 0:
                     #See test set performance
                     accuracySum = 0.0
 
