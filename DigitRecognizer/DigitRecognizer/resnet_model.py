@@ -29,6 +29,7 @@ train_data, valid_data, train_labels, valid_labels = train_test_split(train_data
 
 #Convert to numpy arrays for tensorflow
 train_data, train_labels = reformat(train_data.as_matrix(), train_labels.as_matrix())
+valid_data, valid_labels = reformat(valid_data.as_matrix(), valid_labels.as_matrix())
 
 print("Train data", train_data.shape)
 print("Train labels", train_labels.shape)
@@ -257,18 +258,19 @@ def TrainModel(min_lr, max_lr, stepsize, max_iter, name):
                         print("Loss is NaN at step:", step)
                         break
 
+                num_batches = 42
                 if step % 100 == 0:
                     #See test set performance
                     accuracySum = 0.0
 
-                    for i in range(0, len(valid_data), int(len(valid_data) / 100)):
-                        batch_data = valid_data[i:i + int(len(valid_data) / 100)]
-                        batch_labels = np.squeeze(valid_labels[i:i + int(len(valid_data) / 100)])
+                    for i in range(0, len(valid_data), int(len(valid_data) / num_batches)):
+                        batch_data = valid_data[i:i + int(len(valid_data) / num_batches)]
+                        batch_labels = np.squeeze(valid_labels[i:i + int(len(valid_data) / num_batches)])
                         feed_dict = {input : batch_data, labels : batch_labels, learning_rate: lr, is_training: False} 
                         l, predictions, acc = session.run([cost, train_prediction, tf_accuracy], feed_dict=feed_dict)
                         accuracySum = accuracySum + acc
 
-                    print('Test accuracy: %.1f%%' % ((accuracySum / 100) * 100))
+                    print('Test accuracy: %.1f%%' % ((accuracySum / num_batches) * 100))
         
 
 if __name__ == '__main__':
