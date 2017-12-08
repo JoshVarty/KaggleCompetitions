@@ -7,7 +7,6 @@ import pandas as pd
 from random import randint
 
 
-
 image_size = 28
 num_channels = 1
 num_labels = 10
@@ -282,12 +281,14 @@ def TrainModel(min_lr, max_lr, stepsize, max_iter, name):
             for step in range(num_steps):
                 offset = (step * batch_size) % (test_data.shape[0] - batch_size)
                 batch_data = test_data[offset:(offset + batch_size), :, :, :]
-                feed_dict = {tf_test_dataset : batch_data}
+                feed_dict = {input : batch_data, is_training : False}
                 
                 predictions = session.run([train_prediction], feed_dict=feed_dict)
-                results = np.argmax(predictions)
+                preditions = predictions[0]
+                results = np.argmax(predictions, axis=1)
+                results = np.squeeze(results)
 
-                all_results = np.concatenate((all_results, results))
+                all_results = np.concatenate((all_results, results), axis=0)
 
             with open("results/results.csv", 'w') as file:
                 file.write("id,label\n")
@@ -301,10 +302,6 @@ def TrainModel(min_lr, max_lr, stepsize, max_iter, name):
 
 
 
-
-                            
-        
-
 if __name__ == '__main__':
     try:
         shutil.rmtree(tensorboardPath)
@@ -316,4 +313,4 @@ if __name__ == '__main__':
     stepsize = 5000
     max_iter = 10000
 
-    TrainModel(0.1, 3.0, 5000, 5000, "Fig1b")
+    TrainModel(0.1, 3.0, 5000, 500, "Fig1b")
