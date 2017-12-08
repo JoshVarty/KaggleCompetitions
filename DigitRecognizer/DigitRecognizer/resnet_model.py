@@ -17,8 +17,8 @@ train_data = pd.read_csv("../input/train.csv");
 test_data = pd.read_csv("../input/test.csv");
 test_data = test_data.as_matrix().reshape((-1, image_size, image_size, num_channels)).astype(np.float32)
 
-train_data = train_data.iloc[:,1:]
 train_labels = train_data.iloc[:,:1]
+train_data = train_data.iloc[:,1:]
 
 def reformat(dataset, labels):
   dataset = dataset.reshape((-1, image_size, image_size, num_channels)).astype(np.float32)
@@ -284,7 +284,7 @@ def TrainModel(min_lr, max_lr, stepsize, max_iter, name):
                 feed_dict = {input : batch_data, is_training : False}
                 
                 predictions = session.run([train_prediction], feed_dict=feed_dict)
-                preditions = predictions[0]
+                predictions = predictions[0]
                 results = np.argmax(predictions, axis=1)
                 results = np.squeeze(results)
 
@@ -313,4 +313,4 @@ if __name__ == '__main__':
     stepsize = 5000
     max_iter = 10000
 
-    TrainModel(0.1, 3.0, 5000, 500, "Fig1b")
+    TrainModel(0.1, 3.0, 5000, 5000, "Fig1b")
