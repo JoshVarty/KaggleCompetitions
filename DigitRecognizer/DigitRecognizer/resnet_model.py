@@ -38,6 +38,11 @@ print("Test data", test_data.shape)
 
 def TrainModel(min_lr, max_lr, stepsize, max_iter, name):
 
+    print("MinLr", min_lr)
+    print("MaxLr", max_lr)
+    print("Stepsize", stepsize)
+    print("MaxIter", max_iter)
+
     def bias_variable(name, shape):
         return tf.get_variable(name, shape, initializer=tf.constant_initializer(0))
 
@@ -240,8 +245,8 @@ def TrainModel(min_lr, max_lr, stepsize, max_iter, name):
                 batch_data = train_data[offset:(offset + batch_size), :, :]
                 batch_labels = np.squeeze(train_labels[offset:(offset + batch_size), :])
 
-                cycle = np.floor(1 + step / (2 * stepsize))
-                x = np.abs(step/stepsize - 2 * cycle + 1)
+                cycle = np.floor(1.0 + step / (2.0 * stepsize))
+                x = np.abs(float(step)/float(stepsize) - 2.0 * cycle + 1.0)
                 lr = min_lr + (max_lr - min_lr) * np.max((0.0, 1.0 - x))
 
                 feed_dict = {input : batch_data, labels : batch_labels, learning_rate: lr, is_training: True} 
@@ -294,7 +299,7 @@ def TrainModel(min_lr, max_lr, stepsize, max_iter, name):
                 all_results = np.concatenate((all_results, results), axis=0)
 
             with open("results/results.csv", 'w') as file:
-                file.write("id,label\n")
+                file.write("ImageId,Label\n")
                 for idx in range(len(all_results)):
                      prediction = int(all_results[idx])
 
@@ -311,9 +316,9 @@ if __name__ == '__main__':
     except:
         pass
 
-    min_lr = 0.1
-    max_lr = 3.0
+    min_lr = 0.05
+    max_lr = 0.5
     stepsize = 5000
     max_iter = 10000
 
-    TrainModel(0.1, 3.0, 5000, 5000, "Fig1b")
+    TrainModel(min_lr, max_lr, stepsize, max_iter, "Fig1b")
