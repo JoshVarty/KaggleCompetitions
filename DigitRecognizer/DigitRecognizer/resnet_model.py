@@ -134,12 +134,12 @@ def TrainModel(min_lr, max_lr, stepsize, max_iter, name):
 
         return net
     
-    def random_flip_left_right(input):
-        batch = tf.shape(input)[0]
-        uniform_random = tf.random_uniform([batch], 0, 1.0)
-        mirror_cond = tf.less(uniform_random, 0.5)
-        result = tf.where(mirror_cond, x=input, y=tf.reverse(input, [2]))
-        return result
+    def pad_and_random_crop(input):
+        dynamic_shape = tf.shape(input)
+        input = tf.image.resize_image_with_crop_or_pad(input, 32, 32)
+        input = tf.random_crop(input, dynamic_shape)
+        input = tf.reshape(input, [-1, image_size, image_size, num_channels])
+        return input
 
     graph = tf.Graph()
     with graph.as_default():
@@ -148,6 +148,9 @@ def TrainModel(min_lr, max_lr, stepsize, max_iter, name):
         is_training = tf.placeholder(tf.bool, name='is_training')
         learning_rate = tf.placeholder(tf.float32, shape=(), name="learning_rate")
 
+        input = tf.cond(is_training,
+                        lambda: pad_and_random_crop(input),
+                        lambda: input)
         #If we're training, randomly flip the image
         #input = tf.cond(is_training,
         #                         lambda: random_flip_left_right(input),
