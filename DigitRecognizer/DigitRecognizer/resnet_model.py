@@ -33,8 +33,9 @@ valid_data, valid_labels = reformat(valid_data.as_matrix(), valid_labels.as_matr
 
 print("Train data", train_data.shape)
 print("Train labels", train_labels.shape)
-print("Test data", valid_data.shape)
-print("Test labels", valid_labels.shape)
+print("Valid data", valid_data.shape)
+print("Valid labels", valid_labels.shape)
+print("Test data", test_data.shape)
 
 def TrainModel(min_lr, max_lr, stepsize, max_iter, name):
 
@@ -271,6 +272,37 @@ def TrainModel(min_lr, max_lr, stepsize, max_iter, name):
                         accuracySum = accuracySum + acc
 
                     print('Test accuracy: %.1f%%' % ((accuracySum / num_batches) * 100))
+
+
+            all_results = np.array([])
+            #Now run the test
+            #28,000 test images = 280 * 100
+            num_steps = 280
+            batch_size = 100
+            for step in range(num_steps):
+                offset = (step * batch_size) % (test_data.shape[0] - batch_size)
+                batch_data = test_data[offset:(offset + batch_size), :, :, :]
+                feed_dict = {tf_test_dataset : batch_data}
+                
+                predictions = session.run([train_prediction], feed_dict=feed_dict)
+                results = np.argmax(predictions)
+
+                all_results = np.concatenate((all_results, results))
+
+            with open("results/results.csv", 'w') as file:
+                file.write("id,label\n")
+                for idx in range(len(all_results)):
+                     prediction = int(all_results[idx])
+
+                     file.write(str(idx + 1))
+                     file.write(",")
+                     file.write(str(prediction))
+                     file.write("\n")
+
+
+
+
+                            
         
 
 if __name__ == '__main__':
@@ -284,4 +316,4 @@ if __name__ == '__main__':
     stepsize = 5000
     max_iter = 10000
 
-    TrainModel(0.1, 3.0, 5000, 10000, "Fig1b")
+    TrainModel(0.1, 3.0, 5000, 5000, "Fig1b")
